@@ -3,4 +3,9 @@ class Queue
 	def initialize
 		@results = []
 	end
+  
+  #store method to store results
+  def store(results)
+    @results = results
+  end
 end
