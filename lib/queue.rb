@@ -8,4 +8,9 @@ class Queue
   def store(results)
     @results = results
   end
+
+  #clear method to clear results
+  def clear()
+    @results = nil
+  end
 end

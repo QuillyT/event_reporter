@@ -16,7 +16,6 @@ class QueueTest < Minitest::Test
   end
 
 	def test_clear_method_clears_data
-    skip
 		q = Queue.new
 		results = {:first_name=>"Johnny"}
 		q.store(results)
