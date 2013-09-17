@@ -7,13 +7,20 @@ class QueueTest < Minitest::Test
 		q = Queue.new
 		assert_kind_of Queue, q
 	end	
+  
+  def test_store_result
+    q = Queue.new
+    results = {first_name: "Johnny"}
+    q.store results
+    assert_equal results,q.stored_results
+  end
+
 	def test_clear_method_clears_data
     skip
 		q = Queue.new
 		results = {:first_name=>"Johnny"}
 		q.store(results)
 		q.clear()
-		skip "test this later"
+    assert_equal q.stored_results,nil
 	end
-
 end
