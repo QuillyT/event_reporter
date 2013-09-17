@@ -1,6 +1,6 @@
 class Queue
-	attr :commands
+	attr_accessor :results
 	def initialize
-		:commands = []
+		@results = []
 	end
 end

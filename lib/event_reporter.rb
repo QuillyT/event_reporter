@@ -11,6 +11,3 @@ class EventReporter
 		end
 	end
 end
-
-a = EventReporter.new
-a.run
