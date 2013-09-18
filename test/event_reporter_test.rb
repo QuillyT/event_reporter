@@ -4,10 +4,10 @@ require './lib/event_reporter'
 require './lib/attendee'
 
 class EventReporterTest < MiniTest::Test
-	def test_it_exists
-		er = EventReporter.new
-		assert_kind_of EventReporter,er
-	end
+  def test_it_exists
+    er = EventReporter.new
+    assert_kind_of EventReporter,er
+  end
   def test_load_file_test_gets_first_entry
     er = EventReporter.new
     er.load_file('event_attendees.csv')
