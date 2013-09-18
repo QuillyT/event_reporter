@@ -30,7 +30,8 @@ class QueueTest < Minitest::Test
     5.times do
       results.push Attendee.new
     end
-    asset_equal 5,q.count
+    q.store results
+    assert_equal 5,q.count
   end
     
 end

@@ -10,7 +10,12 @@ class Queue
   end
 
   #clear method to clear results
-  def clear()
+  def clear
     @results = nil
+  end
+
+  #count method prints out number of records currently in queue
+  def count
+    @results.length
   end
 end
