@@ -16,7 +16,10 @@ class EventReporter
 		end
 	end
 
-  def load_file(filename)
+  def load_file(filename=nil)
+    if !filename
+      filename = 'event_attendees.csv'
+    end
     contents = CSV.open filename, headers: true, header_converters: :symbol
     contents.each do |row|
       input = { first_name:   row[:first_name],
