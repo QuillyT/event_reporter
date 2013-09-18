@@ -1,6 +1,8 @@
 class EventReporter
+  attr_accessor :attendee_list
 	def initialize
 		#puts "Initializing Event Reporter!"
+    @attendee_list = []
 	end
 
 	def run

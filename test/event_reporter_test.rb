@@ -7,4 +7,10 @@ class EventReporterTest < Minitest::Test
 		er = EventReporter.new
 		assert_kind_of EventReporter,er
 	end
+  def test_load_file_test_gets_first_entry
+      er = EventReporter.new
+      er.load_file('event_attendees.csv')
+      assert_equals 'Allison', er.attendees_list[0].first_name
+  end
+
 end
