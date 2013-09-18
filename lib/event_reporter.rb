@@ -1,6 +1,6 @@
 class EventReporter
 	def initialize
-		puts "Initializing Event Reporter!"
+		#puts "Initializing Event Reporter!"
 	end
 
 	def run

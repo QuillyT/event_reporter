@@ -1,8 +1,8 @@
 class PhoneNumber
-	attr_accessor :number
+	attr_accessor :value
 
 	def initialize(input = nil)
-		@number = clean_phone_number(input)
+		@value = clean_phone_number(input)
 	end
 
 	def clean_phone_number(number)

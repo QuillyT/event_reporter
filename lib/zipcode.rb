@@ -1,15 +1,19 @@
 class Zipcode
-	attr_accessor :zipcode 
+	attr_accessor :value
 
 	def initialize(input = nil)
-		@zipcode = clean_zipcode(input)
+		@value = clean_zipcode(input)
 	end
 
 	def clean_zipcode(number)
 		if number
-			number = number.rjust(5,"0")[0..4]
+	    number = number.to_s.rjust(5,"0")[0..4]
+      if number.scan(/^\D+/).length==1
+        number = "00000"
+      end
 		else
-			"00000"
+			number = "00000"
 		end
+    number
 	end
 end
