@@ -15,10 +15,8 @@ class ZipcodeTest < Minitest::Test
 	end
 
 	def test_it_only_grabs_the_five_digit_portion_of_the_entry
-		def test_onee
-			zipcode = Zipcode.new "20854-0123"
-			assert_equal "20854", zipcode.value
-		end
+		zipcode = Zipcode.new "20854-0123"
+		assert_equal "20854", zipcode.value
 	end
 
 	def test_it_throws_away_the_numbers_that_are_too_long
