@@ -9,7 +9,7 @@ class UserInputTest < MiniTest::Test
   end
   def test_if_command_attribute_exists
     i = UserInput.new
-    i.read('q')
+    i.format('q')
     assert_equal i.command,'q'
   end
   def test_if_command_is_set_to_help
