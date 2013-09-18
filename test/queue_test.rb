@@ -1,6 +1,7 @@
 require 'minitest'
 require 'minitest/autorun'
 require './lib/queue'
+require './lib/attendee'
 
 class QueueTest < Minitest::Test
 	def test_it_exists
@@ -22,4 +23,14 @@ class QueueTest < Minitest::Test
 		q.clear()
     assert_equal q.results,nil
 	end
+
+  def test_count
+    q = Queue.new
+    results = []
+    5.times do
+      results.push Attendee.new
+    end
+    asset_equal 5,q.count
+  end
+    
 end
