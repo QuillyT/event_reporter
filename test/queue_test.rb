@@ -21,7 +21,7 @@ class QueueTest < Minitest::Test
 		results = {:first_name=>"Johnny"}
 		q.store(results)
 		q.clear()
-    assert_equal q.results,nil
+    assert_equal 0,q.results.length
 	end
 
   def test_count
@@ -33,5 +33,4 @@ class QueueTest < Minitest::Test
     q.store results
     assert_equal 5,q.count
   end
-    
 end

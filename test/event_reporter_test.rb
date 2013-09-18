@@ -20,4 +20,7 @@ class EventReporterTest < Minitest::Test
     a = er.attendee_list[0]
     assert_equal 'Allison', a.first_name
   end
+  def test_load_file_when_file_doesnt_exist
+    skip
+  end
 end

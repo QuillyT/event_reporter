@@ -2,19 +2,20 @@ require './lib/attendee'
 require 'csv'
 
 class EventReporter
-  attr_accessor :attendee_list
-	def initialize
-		#puts "Initializing Event Reporter!"
+  attr_accessor :attendee_list, :results
+  def initialize
+    puts "Initializing Event Reporter!"
     @attendee_list = []
-	end
+    @results = Queue.new
+  end
 
-	def run
-		command = ""
-		while command != 'q'
-			printf "Enter command: "
-			command = gets.chomp
-		end
-	end
+  def run
+    input = UserInput.new
+    while input.command != 'q'
+      input.get_input
+      process(input)
+    end
+  end
 
   def load_file(filename=nil)
     if !filename
