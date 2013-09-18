@@ -3,7 +3,7 @@ require 'minitest/autorun'
 require './lib/event_reporter'
 require './lib/attendee'
 
-class EventReporterTest < Minitest::Test
+class EventReporterTest < MiniTest::Test
 	def test_it_exists
 		er = EventReporter.new
 		assert_kind_of EventReporter,er

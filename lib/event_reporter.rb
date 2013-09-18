@@ -4,7 +4,7 @@ require 'csv'
 class EventReporter
   attr_accessor :attendee_list, :results
   def initialize
-    puts "Initializing Event Reporter!"
+    #puts "Initializing Event Reporter!"
     @attendee_list = []
     @results = Queue.new
   end
