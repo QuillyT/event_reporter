@@ -5,47 +5,72 @@ require './lib/queue'
 require './lib/help'
 
 class EventReporter
-  attr_accessor :contents, :queue, :help
-  def initialize
-    puts "Initializing Event Reporter!"
-    @content = []
-    @queue = Queue.new
-    @help = Help.new
+  attr_accessor :contents, :results_queue
+
+  def run
+    input = ""
+    while input != 'quit'
+      input = prompt_for_input
+      process input
+    end
   end
 
-  def load_file(filename=nil)
-    filename = 'event_attendees.csv' if filename.nil?
+  def prompt_for_input
+    OutputHandler.output(EventReporterMessage.prompt)
+    gets.chomp
+  end
+
+  def process(input)
+    entered_command,remainder = input.split(" ",2)
+    found_command = commands.find{|command|command==entered_command.to_sym}
+    execute(found_command,remainder)
+  end
+
+  def commands
+    commands = [:load,:find,:help,:queue,:quit]
+  end
+
+  def execute(command,args)
+    command ||= :no_command
+    send(command,args)
+  end
+
+  def load(filename)
+    filename||=default_file_name
+    load_csv_file(filename)
+  end
+
+  def default_file_name
+    "event_attendees.csv"
+  end
+
+  def load_csv_file(filename)
     begin
       @contents = CSV.open filename, headers: true, header_converters: :symbol
     rescue
       puts "Error loading file."
     end
-    
   end
 
-  def prompt_user
-    printf "Enter command: "
-    gets.chomp
+  def find
+    OutputHandler.output("finding results")
   end
 
-  def load(parts=nil)
-    filename = parts[1]
-    load_file(filename)
+  def help
+    OutputHandler.output("displaying help")
   end
 
-  def helper?(input)
-    @help.messages.has_key? input.to_sym
+  def queue
+    OutputHandler.output("queue commands")
   end
 
-  def help_options(parts)
-    if !parts[1].nil?
-      symbol = parts[1..-1].join("_")
-      puts @help.get_message(symbol.to_sym) if helper? symbol  
-      puts @help.get_message(:none) if !(helper? symbol)
-      #binding.pry
-    else
-      puts @help.get_message(:help)
-    end
+  def quit
+    OutputHandler.output("Exiting Event Reporter. Goodbye!")
+    exit true
+  end
+
+  def no_command(args=nil)
+    OutputHandler.output(EventReporterMessage.invalid)
   end
 
   def count
@@ -57,40 +82,6 @@ class EventReporter
     puts "Cleared the search results."
   end
 
-  def print(parts)
-    if parts[2]=="by" && parts[3]
-      attribute = parts[3]
-      @queue.print_by(attribute.to_sym)
-    elsif parts[2].nil? && parts[3].nil?
-      @queue.print
-    elsif parts[2]!="by"
-      puts "Invalid call to print."
-    end
-    #binding.pry
-  end
-
-  def save(parts)
-    if parts[3] && parts[2]=="to"
-      @queue.save(parts[3])
-    else
-      puts "Invalid call to save."
-    end
-    #binding.pry
-  end
-
-  def queue_options(parts)
-    if !(parts[1].nil?)
-      case parts[1]
-      when 'count' then count
-      when 'clear' then clear
-      when 'print' then print parts
-      when 'save' then save parts
-      else puts "Invalid queue command."
-      end
-    end
-    #binding.pry
-  end
-
   def attribute?(part)
     if part
       ["first_name","last_name","homephone","zipcode",
@@ -100,7 +91,7 @@ class EventReporter
     end
   end
 
-  def find(parts)
+  def find_h(parts)
     if attribute? parts[1]
       if !@contents.nil?
         clear
@@ -122,29 +113,34 @@ class EventReporter
     end
   end
 
-  def process(input)
-    parts = input.split
-    command = parts[0]
-    case command
-      when 'quit' then 
-        puts "Goodbye!"
-      when 'load' then load parts
-      when 'help' then help_options parts
-      when 'queue' then queue_options parts
-      when 'find' then find parts
-      else puts "Invalid command."
-    end
-    puts ""
-  end
-
-  def run
-    input = ""
-    while input != 'quit'
-      input = prompt_user
-      process input
-    end
+  def initialize
+    puts "Initializing Event Reporter!"
+    @content = []
+    @queue = Queue.new
+    @help = Help.new
   end
 end
 
-er = EventReporter.new
-er.run
+class OutputHandler
+  def self.output(message)
+    puts message.to_s
+  end
+end
+
+class EventReporterMessage
+  def self.prompt
+    %(Enter Command: )
+  end
+  def self.quit
+    %(Exiting Event Reporter. Goodbye!)
+  end
+  def self.invalid
+    %(Invalid command.)
+  end
+  def self.load
+  end
+  def self.find
+  end
+  def self.help
+  end
+end
