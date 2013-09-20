@@ -3,6 +3,8 @@ require 'pry'
 require './lib/attendee'
 require './lib/queue'
 require './lib/help'
+require './lib/output_handler'
+require './lib/event_reporter_message'
 
 class EventReporter
   attr_accessor :contents, :results_queue
