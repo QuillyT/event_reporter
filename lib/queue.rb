@@ -1,10 +1,10 @@
 require 'pry'
 
 class Queue
-	attr_accessor :results
-	def initialize
-		@results = []
-	end
+  attr_accessor :results
+  def initialize
+    @results = []
+  end
 
   def clear
     @results = []
@@ -18,6 +18,7 @@ class Queue
     puts "\n\nLAST NAME\tFIRST NAME\tEMAIL\tZIPCODE\
 \tCITY\tSTATE\tADDRESS\tPHONE"
   end
+
   def print
     print_header
     @results.each do |person|

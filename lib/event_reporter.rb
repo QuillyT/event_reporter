@@ -49,7 +49,7 @@ class EventReporter
 
   def load_csv_file(filename)
     begin
-      @contents = CSV.open filename, headers: true, header_converters: :symbol
+      @contents = CSV.read filename, headers: true, header_converters: :symbol
       OutputHandler.output(EventReporterMessage.loaded)
     rescue
       OutputHandler.output(EventReporterMessage.load_error)
@@ -63,12 +63,23 @@ class EventReporter
   end
 
   def update_queue(attribute,criteria)
-    results = @contents.find_all{|row|row[attribute.to_sym]==criteria}
-    push_attendees_to_queue(results)
+    results = @contents.find_all{|row|row[attribute_converter(attribute)].downcase==criteria.downcase}
+    set_queue_to_attendees(results)
   end
 
-  def push_attendees_to_queue(results)
-    @queue = results.collect{|row|Attendee.new(row)}
+  def attribute_converter(attribute)
+    { "first_name"=>:first_name,
+      "last_name"=>:last_name,
+      "phone_number"=>:homephone,
+      "zipcode"=>:zipcode,
+      "city"=>:city,
+      "state"=>:state,
+      "address"=>:street,
+      "email"=>:email_address}
+  end
+
+  def set_queue_to_attendees(results)
+    @results_queue.results = results.collect{|row|Attendee.new(row)}
     OutputHandler.output(EventReporterMessage.find)
   end
 
@@ -77,9 +88,13 @@ class EventReporter
   end
 
   def attribute_not_okay?(attribute)
-    attribute_is_bad = not(valid_attributes.find_index attribute)
-    OutputHandler.output(EventReporterMessage.bad_attribute) if attribute_is_bad
-    attribute_is_bad
+    not(is_valid_attribute?(attribute))
+  end
+
+  def is_valid_attribute?(attribute)
+    good_attribute = (valid_attributes.find_index(attribute) && true)
+    OutputHandler.output(EventReporterMessage.bad_attribute) if not good_attribute
+    good_attribute
   end
 
   def criteria_nil?(criteria)
@@ -105,24 +120,79 @@ class EventReporter
   end
 
   def queue(args)
-    entered_command,remainder = input.split(" ",2)
+    args||=""
+    entered_command,remainder = args.split(" ",2)
     entered_command||=""
     found_command = queue_commands.find{|command|command==entered_command.to_sym}
     execute(found_command,remainder)
   end
 
   def queue_commands
-    [:count,:clear,:print,:print_by,:save_to]
+    [:count,:clear,:print,:print,:save]
   end
 
-  def count
+  def count(args=nil)
     OutputHandler.print(EventReporterMessage.count)
     OutputHandler.output(@results_queue.count)
   end
 
-  def clear
-    @queue.clear
+  def clear(args=nil)
+    @results_queue.clear
     OutputHandler.output(EventReporterMessage.clear)
+  end
+
+  def print(args=nil)
+    if(args==nil)
+      print_results
+    else
+      print_by(args)
+    end
+  end
+
+  def print_results
+    @results_queue.print
+  end
+
+  def print_by(args)
+    @results_queue.print_by(args) if print_by_attribute? args
+  end
+
+  def print_by_attribute?(command,attribute)
+    is_print_by?(command) && is_valid_attribute?(attribute)
+  end
+
+  def is_print_by?(command)
+    is_by = (command=='by')
+    OutputHandler.output(EventReporterMessage.invalid) if not is_by
+    is_by
+  end
+
+  def save(args=nil)
+    args||=""
+    @results.save(args) if save_conditions_okay?(args)
+  end
+
+  def save_conditions_okay?(args)
+    command,filename = args.split(" ",2)
+    is_save_to?(command) && valid_file_name?(filename) && !file_exists?(filename)
+  end
+
+  def is_save_to?(args)
+    is_to = (args=="to")
+    OutputHandler.output(EventReporterMessage.invalid) if not is_to
+    is_to
+  end
+
+  def valid_file_name?(args)
+    good_file_name = (args[-4..-1]==".csv")
+    OutputHandler.output(EventReporterMessage.invalid_filename) if not good_file_name
+    good_file_name
+  end
+
+  def file_exists?(args)
+    file_exists = File.exists?(args)
+    OutputHandler.output(EventReporterMessage.invalid_file_exists) if file_exists
+    file_exists
   end
 
   def quit(args=nil)
@@ -134,27 +204,9 @@ class EventReporter
     OutputHandler.output(EventReporterMessage.invalid)
   end
 
-  def attribute?(part)
-    if part
-      ["first_name","last_name","homephone","zipcode",
-        "email","city","address","state"].include? part
-    else
-      false
-    end
-  end
-
   def initialize
     puts "Initializing Event Reporter!"
     @contents = []
-    @queue = Queue.new
-  end
-end
-
-class OutputHandler
-  def self.output(message)
-    puts message.to_s
-  end
-  def self.print(message)
-    printf "\n"+message.to_s
+    @results_queue = Queue.new
   end
 end

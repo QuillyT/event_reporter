@@ -20,6 +20,12 @@ class EventReporterMessage
   def self.criteria_empty
     %(Critera for find is invalid. Type help for info.)
   end
+  def self.invalid_filename
+    %(Filename is invalid)
+  end
+  def self.invalid_file_exists
+    %(Filename already exists)
+  end
   def self.count
     %(Results in queue: )
   end
