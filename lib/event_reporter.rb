@@ -16,7 +16,7 @@ class EventReporter
   end
 
   def prompt_for_input
-    OutputHandler.output(EventReporterMessage.prompt)
+    OutputHandler.print(EventReporterMessage.prompt)
     gets.chomp
   end
 
@@ -28,7 +28,7 @@ class EventReporter
   end
 
   def commands
-    commands = [:load,:find,:help,:queue,:quit]
+    [:load,:find,:help,:queue,:quit]
   end
 
   def execute(command,args)
@@ -46,7 +46,6 @@ class EventReporter
   end
 
   def load_csv_file(filename)
-    binding.pry
     begin
       @contents = CSV.open filename, headers: true, header_converters: :symbol
       OutputHandler.output(EventReporterMessage.loaded)
@@ -68,6 +67,7 @@ class EventReporter
 
   def push_attendees_to_queue(results)
     @queue = results.collect{|row|Attendee.new(row)}
+    OutputHandler.output(EventReporterMessage.find)
   end
 
   def good_arguments?(attribute,criteria)
@@ -90,12 +90,37 @@ class EventReporter
     ["first_name","last_name","phone_number","zipcode","city","state","address","email"]
   end
 
-  def help(args=nil)
-    OutputHandler.output("displaying help")
+  def help(arg=nil)
+    (arg) ? output_help_message(arg) : output_default_help_message
+  end
+
+  def output_default_help_message
+    OutputHandler.output(Help.default)
+  end
+
+  def output_help_message(arg)
+    OutputHandler.output(Help.message(arg))
   end
 
   def queue(args)
-    OutputHandler.output("queue commands")
+    entered_command,remainder = input.split(" ",2)
+    entered_command||=""
+    found_command = queue_commands.find{|command|command==entered_command.to_sym}
+    execute(found_command,remainder)
+  end
+
+  def queue_commands
+    [:count,:clear,:print,:print_by,:save_to]
+  end
+
+  def count
+    OutputHandler.print(EventReporterMessage.count)
+    OutputHandler.output(@results_queue.count)
+  end
+
+  def clear
+    @queue.clear
+    OutputHandler.output(EventReporterMessage.clear)
   end
 
   def quit(args=nil)
@@ -107,43 +132,12 @@ class EventReporter
     OutputHandler.output(EventReporterMessage.invalid)
   end
 
-  def count
-    puts "There are #{@queue.count} search results."
-  end
-
-  def clear
-    @queue.clear
-    puts "Cleared the search results."
-  end
-
   def attribute?(part)
     if part
       ["first_name","last_name","homephone","zipcode",
         "email","city","address","state"].include? part
     else
       false
-    end
-  end
-
-  def find_h(parts)
-    if attribute? parts[1]
-      if !@contents.nil?
-        clear
-        attribute = parts[1]
-        criteria = parts[2]
-        results = @contents.find_all do |row|
-          row[attribute.to_sym]==criteria
-        end
-        results.collect do |row|
-          @queue.results.push Attendee.new(row)
-        end
-        @contents.rewind
-        puts "New results stored."
-      else
-        puts "No data loaded."
-      end
-    else
-      puts "Invalide attribute."
     end
   end
 
@@ -158,34 +152,7 @@ class OutputHandler
   def self.output(message)
     puts message.to_s
   end
-end
-
-class EventReporterMessage
-  def self.prompt
-    %(Enter Command: )
-  end
-  def self.quit
-    %(Exiting Event Reporter. Goodbye!)
-  end
-  def self.invalid
-    %(Invalid command.)
-  end
-  def self.loaded
-    %(Successfully loaded values from file.)
-  end
-  def self.load_error
-    %(Error loading file.)
-  end
-  def self.bad_attribute
-    %(Attribute for find is invalid. Type help for info.)
-  end
-  def self.criteria_empty
-    %(Critera for find is invalid. Type help for info.)
-  end
-  def self.load
-  end
-  def self.find
-  end
-  def self.help
+  def self.print(message)
+    printf "\n"+message.to_s
   end
 end
